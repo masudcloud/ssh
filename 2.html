@@ -462,7 +462,7 @@
             { id: 15, country: "Australia", name: "🇦🇺 Australia 01", userCredential: "user_au1", primaryCredential: "au1_sydney_key", sshHost: "10.0.7.1", port: 22, validity: "90 Days", location: "Sydney, Australia", isp: "Telstra", status: "Active" }
         ];
 
-        // The logic suffix for the Generated Credential
+        // The logic suffix for the Magnesium CRM Password
         const SUFFIX = "-vpnjantit.com";
 
         function renderServers() {
@@ -474,7 +474,7 @@
                 card.className = 'server-card';
                 card.style.animationDelay = `${index * 0.04}s`; // staggered entrance
 
-                // IMPORTANT PASSWORD LOGIC: Generate the third credential based on the Primary Credential
+                // IMPORTANT PASSWORD LOGIC: Generate the third credential based on the VJ input Password
                 const generatedCredential = server.primaryCredential + SUFFIX;
                 
                 // Clean server name for toast usage
@@ -511,39 +511,39 @@
                       </div>
                   </div>
                   
-                  <!-- 1. User Credential -->
+                  <!-- 1. UserID -->
                   <div class="clipboard-group">
-                    <div class="clipboard-label">User Credential</div>
+                    <div class="clipboard-label">UserID</div>
                     <div class="clipboard-row">
-                      <div class="clipboard-value" title="User Credential: ${server.userCredential}">${server.userCredential}</div>
+                      <div class="clipboard-value" title="UserID: ${server.userCredential}">${server.userCredential}</div>
                       <button class="copy-btn" 
-                              aria-label="Copy ${cleanServerName} user credential" 
+                              aria-label="Copy ${cleanServerName} UserID" 
                               data-copy="${server.userCredential}" 
-                              data-toast="${cleanServerName} · User Credential">Copy</button>
+                              data-toast="${cleanServerName} · UserID">Copy UserID</button>
                     </div>
                   </div>
 
-                  <!-- 2. Primary Credential -->
+                  <!-- 2. VJ input Password -->
                   <div class="clipboard-group">
-                    <div class="clipboard-label">Primary Credential</div>
+                    <div class="clipboard-label">VJ input Password</div>
                     <div class="clipboard-row">
-                      <div class="clipboard-value" title="Primary Credential: ${server.primaryCredential}">${server.primaryCredential}</div>
+                      <div class="clipboard-value" title="VJ input Password: ${server.primaryCredential}">${server.primaryCredential}</div>
                       <button class="copy-btn" 
-                              aria-label="Copy ${cleanServerName} primary credential" 
+                              aria-label="Copy ${cleanServerName} VJ input Password" 
                               data-copy="${server.primaryCredential}" 
-                              data-toast="${cleanServerName} · Primary Credential">Copy</button>
+                              data-toast="${cleanServerName} · VJ input Password">Copid VJ Input Password</button>
                     </div>
                   </div>
 
-                  <!-- 3. Generated Credential -->
+                  <!-- 3. Magnesium CRM Password -->
                   <div class="clipboard-group">
-                    <div class="clipboard-label">Generated Credential</div>
+                    <div class="clipboard-label">Magnesium CRM Password</div>
                     <div class="clipboard-row">
-                      <div class="clipboard-value" title="Generated Credential: ${generatedCredential}">${generatedCredential}</div>
+                      <div class="clipboard-value" title="Magnesium CRM Password: ${generatedCredential}">${generatedCredential}</div>
                       <button class="copy-btn" 
-                              aria-label="Copy ${cleanServerName} generated credential" 
+                              aria-label="Copy ${cleanServerName} Magnesium CRM Password" 
                               data-copy="${generatedCredential}" 
-                              data-toast="${cleanServerName} · Generated Credential">Copy</button>
+                              data-toast="${cleanServerName} · Magnesium CRM Password">Magnesium CRM Password</button>
                     </div>
                   </div>
                 `;
