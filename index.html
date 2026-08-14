@@ -4,7 +4,267 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>VPN Clipboard Manager</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --bg-color: #f2f2f7; /* iOS background color */
+      --card-bg: rgba(255, 255, 255, 0.45);
+      --card-border: rgba(255, 255, 255, 0.6);
+      --text-main: #1d1d1f;
+      --text-secondary: #86868b;
+      --btn-bg: rgba(255, 255, 255, 0.6);
+      --btn-bg-hover: rgba(255, 255, 255, 0.9);
+      --btn-border: rgba(255, 255, 255, 0.8);
+      --accent: #007aff;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      background-image: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      /* Safe area insets for notched phones */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) max(40px, env(safe-area-inset-bottom)) env(safe-area-inset-left);
+      box-sizing: border-box;
+    }
+
+    /* Background blobs for more liquid/glass effect */
+    .bg-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: -1;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 40vw;
+      height: 40vw;
+      min-width: 300px;
+      min-height: 300px;
+      background: #ffb6ff;
+      top: -10%;
+      left: -10%;
+    }
+    .blob-2 {
+      width: 50vw;
+      height: 50vw;
+      min-width: 400px;
+      min-height: 400px;
+      background: #b6ffff;
+      bottom: -10%;
+      right: -10%;
+    }
+
+    .header {
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: -0.8px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .server-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .server-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .server-header {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding-bottom: 14px;
+    }
+
+    .server-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-main);
+      letter-spacing: -0.4px;
+    }
+
+    .clipboard-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .clipboard-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .clipboard-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 14px;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .clipboard-row:hover {
+      background: rgba(255, 255, 255, 0.6);
+      border-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .clipboard-value {
+      font-family: ui-monospace, "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 12px;
+      flex-grow: 1;
+    }
+
+    .copy-btn {
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .copy-btn:hover {
+      background: var(--btn-bg-hover);
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.95);
+      background: rgba(230, 230, 230, 0.8);
+    }
+
+    .copy-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      top: 40px; /* Standard iOS notification placement */
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Spring-like animation */
+      z-index: 1000;
+      width: max-content;
+      max-width: 90vw;
+    }
+
+    .toast-container.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      padding: 14px 24px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast-icon {
+      color: #34c759; /* iOS green */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast-message {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 50px 20px 30px; }
+      .header h1 { font-size: 2.2rem; }
+      .container { grid-template-columns: minmax(280px, 1fr); }
+      .server-card { padding: 20px; border-radius: 20px; }
+      .toast-container { top: 20px; }
+      .toast { padding: 12px 20px; }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 2rem; }
+      .clipboard-row { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px; }
+      .clipboard-value { margin-right: 0; text-align: center; }
+      .copy-btn { width: 100%; padding: 12px; font-size: 1rem; }
+    }
+  </style>
 </head>
 <body>
   <!-- Decorative Liquid Background -->
@@ -32,6 +292,153 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    // 15 unique servers as requested
+    const servers = [
+      { name: "India 1", password: "123456" },
+      { name: "India 2", password: "india2_pass" },
+      { name: "Singapore 1", password: "sg1_secure" },
+      { name: "Singapore 2", password: "sg2_secure" },
+      { name: "Pakistan 1", password: "pk1_access" },
+      { name: "Pakistan 2", password: "pk2_access" },
+      { name: "USA 1", password: "us1_admin" },
+      { name: "USA 2", password: "us2_admin" },
+      { name: "UK 1", password: "uk1_london" },
+      { name: "UK 2", password: "uk2_london" },
+      { name: "Germany 1", password: "de1_berlin" },
+      { name: "Germany 2", password: "de2_berlin" },
+      { name: "Japan 1", password: "jp1_tokyo" },
+      { name: "Japan 2", password: "jp2_tokyo" },
+      { name: "Australia 1", password: "au1_sydney" }
+    ];
+
+    // The required logic suffix
+    const SUFFIX = "-vpnjanti.com";
+
+    function renderServers() {
+      const container = document.getElementById('servers-container');
+      container.innerHTML = '';
+
+      servers.forEach((server, index) => {
+        const card = document.createElement('div');
+        card.className = 'server-card';
+        card.style.animationDelay = `${index * 0.05}s`; // staggered entrance
+
+        // IMPORTANT PASSWORD LOGIC: Generate second password based on the first
+        const secondPassword = server.password + SUFFIX;
+
+        card.innerHTML = `
+          <div class="server-header">
+            <h2 class="server-title">${server.name}</h2>
+          </div>
+          
+          <div class="clipboard-group">
+            <div class="clipboard-label">Primary Credential</div>
+            <div class="clipboard-row">
+              <div class="clipboard-value" title="Primary Credential: ${server.password}">${server.password}</div>
+              <button class="copy-btn" 
+                      aria-label="Copy ${server.name} primary credential" 
+                      data-copy="${server.password}" 
+                      data-toast="${server.name} — Primary copied">Copy</button>
+            </div>
+          </div>
+
+          <div class="clipboard-group">
+            <div class="clipboard-label">Generated Credential</div>
+            <div class="clipboard-row">
+              <div class="clipboard-value" title="Generated Credential: ${secondPassword}">${secondPassword}</div>
+              <button class="copy-btn" 
+                      aria-label="Copy ${server.name} generated credential" 
+                      data-copy="${secondPassword}" 
+                      data-toast="${server.name} — Generated copied">Copy</button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // Attach event listeners safely
+      const copyButtons = document.querySelectorAll('.copy-btn');
+      copyButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const textToCopy = btn.getAttribute('data-copy');
+          const toastMessage = btn.getAttribute('data-toast');
+          copyText(textToCopy, toastMessage);
+        });
+      });
+    }
+
+    function copyText(text, toastMessage) {
+      // Use modern Clipboard API if available and securely contexted
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(toastMessage);
+        }).catch(err => {
+          console.error('Clipboard API failed: ', err);
+          fallbackCopyTextToClipboard(text, toastMessage);
+        });
+      } else {
+        // Fallback for older browsers or non-secure contexts (HTTP)
+        fallbackCopyTextToClipboard(text, toastMessage);
+      }
+    }
+
+    function fallbackCopyTextToClipboard(text, toastMessage) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      
+      // Prevent scrolling to the bottom by placing it at the top
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0"; // Invisible
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showToast(toastMessage);
+        } else {
+          console.error('Fallback: Copy command was unsuccessful');
+          alert('Failed to copy text. Please try manually.');
+        }
+      } catch (err) {
+        console.error('Fallback: Unable to copy', err);
+        alert('Failed to copy text. Please try manually.');
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    let toastTimeout;
+
+    function showToast(message) {
+      const toastContainer = document.getElementById('toast-container');
+      const toastMessageEl = document.getElementById('toast-message');
+      
+      toastMessageEl.textContent = message;
+      
+      toastContainer.classList.remove('show');
+      
+      // Force a browser reflow to reset the animation if called repeatedly
+      void toastContainer.offsetWidth;
+      
+      toastContainer.classList.add('show');
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastContainer.classList.remove('show');
+      }, 2500);
+    }
+
+    // Initialize application
+    document.addEventListener('DOMContentLoaded', () => {
+      renderServers();
+    });
+  </script>
 </body>
 </html>
