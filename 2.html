@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VPN Credential Manager</title>
+    <style>
+        /* CSS Variables for iOS Liquid Glass Theme */
+        :root {
+            --bg-color: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.06);
+            --text-main: #1c1c1e;
+            --text-muted: #8e8e93;
+            --primary-blue: #007aff;
+            --primary-blue-hover: #005bb5;
+            --primary-blue-bg: rgba(0, 122, 255, 0.1);
+            --success-green: #34c759;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--text-main);
+            /* Soft animated mesh-like gradient background to show off the glass effect */
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin: 40px 0 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1c1c1e;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            padding-bottom: 60px;
+        }
+
+        /* GlassHere is the complete, production-ready, single-file implementation of the responsive Clipboard Manager. It uses HTML, CSS, and Vanilla JavaScript, following the iOS Liquid Glass aesthetic, and satisfies every requirement you outlined. 
+
+Save the code below as `index.html` and open it in any modern browser.
+
+### Complete Source Code (`index.html`)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VPN Clipboard Manager</title>
+    <style>
+        /* 
+         * iOS LIQUID GLASS / LIQUID UI DESIGN 
+         */
+        
+        :root {
+            --bg-color: #f2f5f8;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            --text-main: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-blue: #007aff;
+            --accent-blue-hover: #0056b3;
+            --success-green: #34c759;
+            --border-radius: 20px;
+            --card-padding: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            /* Liquid background blobs */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(200, 220, 255, 0.6) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 230, 240, 0.6) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(200, 240, 255, 0.6) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(230, 230, 255, 0.6) 0px, transparent 50%);
+            background-attachment: fixed;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: var(--card-padding);
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Staggered entry animation */
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.10s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.20s; }
+        .card:nth-child(5) { animation-delay: 0.25s; }
+        .card:nth-child(6) { animation-delay: 0.30s; }
+        .card:nth-child(7) { animation-delay: 0.35s; }
+        .card:nth-child(8) { animation-delay: 0.40s; }
+        .card:nth-child(9) { animation-delay: 0.45s; }
+        .card:nth-child(10) { animation-delay: 0.50s; }
+        .card:nth-child(n+11) { animation-delay: 0.55s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .server-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 12px;
+        }
+
+        .credential-group {
+            margin-bottom: 16px;
+        }
+        
+        .credential-group:last-child {
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        /* Visual indicator for derived value */
+        .credential-group:last-child::before {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: -22px;
+            width: 2px;
+            height: 16px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .credential-group:last-child::after {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: -6px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.15);
+            transform: translateX(-2px);
+        }
+
+        .credential-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .credential-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .credential-value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            color: var(--text-main);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 12px;
+            user-select: all; /* Allows easy manual copy if desired */
+        }
+
+        .derived-value {
+            color: var(--accent-blue);
+        }
+
+        .copy-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-blue-hover);
+            transform: scale(1.02);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.94);
+        }
+
+        .copy-btn:focus-visible {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        /* iOS-Style Toast Notification */
+        #toast {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translate(-50%, -100px) scale(0.9);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border-radius: 40px;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #toast.show {
+            transform: translate(-50%, 0) scale(1);
+            opacity: 1;
+        }
+
+        #toast-icon {
+            color: var(--success-green);
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #toast-message {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        /* Responsive Layout Adjustments */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 16px;
+                padding: 0 16px 40px;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>VPN Manager</h1>
+        <p>15 Active Servers. Tap to copy credentials.</p>
+    </header>
+
+    <main class="container" id="server-container">
+        <!-- Cards injected via JavaScript -->
+    </main>
+
+    <!-- Global iOS-Style Toast -->
+    <div id="toast" role="alert" aria-live="assertive">
+        <div id="toast-icon">✓</div>
+        <div id="toast-message">Copied successfully</div>
+    </div>
+
+    <script>
+        /**
+         * 1. DATA STRUCTURE
+         * Exactly 15 VPN servers. The primary password is provided.
+         * The second password will be dynamically generated.
+         */
+        const vpnServers = [
+            { name: "India 1", password: "pwdIndia123" },
+            { name: "India 2", password: "pwdIndia456" },
+            { name: "Singapore 1", password: "pwdSing123" },
+            { name: "Singapore 2", password: "pwdSing456" },
+            { name: "Pakistan 1", password: "pwdPak123" },
+            { name: "Pakistan 2", password: "pwdPak456" },
+            { name: "USA 1", password: "pwdUsa123" },
+            { name: "USA 2", password: "pwdUsa456" },
+            { name: "USA 3", password: "pwdUsa789" },
+            { name: "UK 1", password: "pwdUk123" },
+            { name: "UK 2", password: "pwdUk456" },
+            { name: "Germany 1", password: "pwdGer123" },
+            { name: "Germany 2", password: "pwdGer456" },
+            { name: "Japan 1", password: "pwdJap123" },
+            { name: "Australia 1", password: "pwdAus123" }
+        ];
+
+        // The suffix that gets appended to the primary password
+        const SUFFIX = "-vpnjanti.com";
+
+        // Toast logic variables
+        const toastEl = document.getElementById('toast');
+        const toastMsgEl = document.getElementById('toast-message');
+        let toastTimeout;
+
+        /**
+         * 2. RENDER LOGIC
+         * Iterates through the data structure and builds the DOM.
+         */
+        function renderServers() {
+            const container = document.getElementById('server-container');
+            container.innerHTML = ''; // Clear container
+
+            vpnServers.forEach((server) => {
+                // IMPORTANT LOGIC: Generate second password automatically
+                const primaryCred = server.password;
+                const generatedCred = primaryCred + SUFFIX;
+
+                // Create Card Element
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                // Construct Card HTML
+                card.innerHTML = `
+                    <h2 class="server-title">${server.name}</h2>
+                    
+                    <!-- Primary Credential -->
+                    <div class="credential-group">
+                        <div class="credential-label">Primary Credential</div>
+                        <div class="credential-row">
+                            <span class="credential-value" title="${primaryCred}">${primaryCred}</span>
+                            <button class="copy-btn" 
+                                    aria-label="Copy ${server.name} primary credential"
+                                    data-val="${primaryCred}" 
+                                    data-name="${server.name}" 
+                                    data-type="Primary">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generated Credential -->
+                    <div class="credential-group">
+                        <div class="credential-label">Generated Credential</div>
+                        <div class="credential-row">
+                            <span class="credential-value derived-value" title="${generatedCred}">${generatedCred}</span>
+                            <button class="copy-btn" 
+                                    aria-label="Copy ${server.name} generated credential"
+                                    data-val="${generatedCred}" 
+                                    data-name="${server.name}" 
+                                    data-type="Generated">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Attach event listeners to all newly created buttons
+            attachCopyListeners();
+        }
+
+        /**
+         * 3. CLIPBOARD LOGIC
+         * Safely copies text to clipboard with modern API and fallback.
+         */
+        function attachCopyListeners() {
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            
+            copyButtons.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const textToCopy = button.getAttribute('data-val');
+                    const serverName = button.getAttribute('data-name');
+                    const credType = button.getAttribute('data-type');
+                    
+                    try {
+                        // Attempt modern Clipboard API first
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(textToCopy);
+                            showToast(`✓ ${serverName} — ${credType} copied`);
+                        } else {
+                            // Fallback for older browsers or restricted environments
+                            fallbackCopyTextToClipboard(textToCopy, serverName, credType);
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy!', err);
+                        // Even if modern fails unexpectedly, attempt fallback
+                        fallbackCopyTextToClipboard(textToCopy, serverName, credType);
+                    }
+                });
+            });
+        }
+
+        function fallbackCopyTextToClipboard(text, serverName, credType) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Move it out of view to avoid scrolling/jumping
+            textArea.style.position = "fixed";
+            textArea.style.top = "-9999px";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(`✓ ${serverName} — ${credType} copied`);
+                } else {
+                    showToast(`❌ Failed to copy ${credType}`);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        /**
+         * 4. UI ANIMATION LOGIC
+         * Shows the iOS-style toast notification.
+         */
+        function showToast(message) {
+            // Clear any existing timeout to reset the timer if spam-clicked
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+                toastEl.classList.remove('show');
+            }
+
+            // Force reflow to restart CSS transition smoothly
+            void toastEl.offsetWidth; 
+
+            toastMsgEl.textContent = message;
+            toastEl.classList.add('show');
+
+            // Hide toast after 2.5 seconds
+            toastTimeout = setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2500);
+        }
+
+        // Initialize the App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderServers();
+        });
+    </script>
+</body>
+</html>
