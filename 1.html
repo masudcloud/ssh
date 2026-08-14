@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VPN Clipboard Manager</title>
+    <style>
+        /* CSS Variables for iOS Liquid Glass Theme */
+        :root {
+            --bg-color: #f2f2f7;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            --text-main: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #007aff;
+            --accent-hover: #0062cc;
+            --success-color: #34c759;
+            --radius-card: 20px;
+            --radius-btn: 10px;
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            /* Animated soft mesh gradient background to enhance the glass effect */
+            background-image: 
+                radial-gradient(at 40% 20%, rgba(255, 226, 233, 1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(223, 241, 255, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(255, 248, 225, 1) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, rgba(234, 226, 255, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(226, 255, 246, 1) 0px, transparent 50%),
+                radial-gradient(at 80% 100%, rgba(255, 235, 226, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 0%, rgba(255, 255, 255, 1) 0px, transparent 50%);
+            background-attachment: fixed;
+            padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 40px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-card);
+            box-shadow: var(--glass-shadow);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease-out forwards;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 12px;
+        }
+
+        /* Credential Row */
+        .credential-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .credential-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .credential-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: background 0.2s ease;
+        }
+
+        .credential-row:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .credential-value {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            color: var(--text-main);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 12px;
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-btn);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            outline: none;
+        }
+
+        .copy-btn:hover, .copy-btn:focus-visible {
+            background: var(--accent-hover);
+            transform: scale(1.02);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Custom iOS Style Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 12px 24px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none; /* Let clicks pass through */
+        }
+
+        .toast-container.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .toast-message {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>VPN Manager</h1>
+        <p class="subtitle">15 Servers • 30 Credentials</p>
+    </header>
+
+    <main id="grid-container" class="grid-container">
+        <!-- Server cards will be injected here via JavaScript -->
+    </main>
+
+    <!-- iOS Liquid Toast Notification -->
+    <div id="toast" class="toast-container">
+        <div class="toast-icon">✓</div>
+        <div id="toast-msg" class="toast-message">Copied successfully</div>
+    </div>
+
+    <script>
+        // 1. Data Structure - 15 Servers
+        // The first password is provided. The second one will be generated automatically.
+        const vpnServers = [
+            { name: "India 1", password: "123456" },
+            { name: "India 2", password: "ABC987" },
+            { name: "Singapore 1", password: "SG-3456" },
+            { name: "Singapore 2", password: "SG-7890" },
+            { name: "Pakistan 1", password: "PK-1234" },
+            { name: "Pakistan 2", password: "PK-5678" },
+            { name: "USA 1", password: "US-QWERTY" },
+            { name: "USA 2", password: "US-ASDFG" },
+            { name: "UK 1", password: "UK-ZXCVB" },
+            { name: "UK 2", password: "UK-POIUY" },
+            { name: "Germany 1", password: "DE-1122" },
+            { name: "Germany 2", password: "DE-3344" },
+            { name: "Japan 1", password: "JP-5566" },
+            { name: "Japan 2", password: "JP-7788" },
+            { name: "Australia 1", password: "AU-9900" }
+        ];
+
+        // Ensure exactly 15 servers are loaded
+        const SUFFIX = "-vpnjanti.com";
+        const gridContainer = document.getElementById("grid-container");
+
+        // 2. Render Cards Dynamically
+        function renderServers() {
+            vpnServers.forEach((server, index) => {
+                // Auto-generate the second clipboard value
+                const generatedPassword = server.password + SUFFIX;
+                
+                // Create Card Element
+                const card = document.createElement('div');
+                card.className = 'card';
+                // Stagger animation delay slightly for visual flow
+                card.style.animationDelay = `${index * 0.05}s`;
+
+                card.innerHTML = `
+                    <div class="card-title">${server.name}</div>
+                    
+                    <div class="credential-group">
+                        <span class="credential-label">Primary Credential</span>
+                        <div class="credential-row">
+                            <span class="credential-value">${server.password}</span>
+                            <button class="copy-btn" 
+                                onclick="copyToClipboard('${server.password}', '${server.name} — Primary copied')" 
+                                aria-label="Copy ${server.name} primary credential">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="credential-group">
+                        <span class="credential-label">Generated Credential</span>
+                        <div class="credential-row">
+                            <span class="credential-value">${generatedPassword}</span>
+                            <button class="copy-btn" 
+                                onclick="copyToClipboard('${generatedPassword}', '${server.name} — Generated copied')"
+                                aria-label="Copy ${server.name} generated credential">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                gridContainer.appendChild(card);
+            });
+        }
+
+        // 3. Clipboard Functionality & Fallback
+        async function copyToClipboard(text, successMessage) {
+            try {
+                // Modern Clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                    showToast(successMessage);
+                } else {
+                    // Fallback for older browsers or restricted environments
+                    fallbackCopyTextToClipboard(text, successMessage);
+                }
+            } catch (err) {
+                console.error("Clipboard copy failed:", err);
+                // Even on error, try fallback just in case
+                fallbackCopyTextToClipboard(text, successMessage);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Prevent scrolling to bottom of page in MS Edge
+            textArea.style.position = "fixed";
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.opacity = "0";
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(successMessage);
+                } else {
+                    console.error("Fallback copy failed.");
+                }
+            } catch (err) {
+                console.error('Fallback copy command error', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // 4. iOS Liquid Glass Toast Notification Logic
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-msg");
+            
+            // Clear any existing timeout to prevent overlapping hides
+            clearTimeout(toastTimeout);
+            
+            // Update message
+            toastMsg.textContent = message;
+            
+            // Show toast
+            toast.classList.add("show");
+            
+            // Hide toast after 2 seconds
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2000);
+        }
+
+        // Initialize application on load
+        document.addEventListener("DOMContentLoaded", renderServers);
+    </script>
+</body>
+</html>
