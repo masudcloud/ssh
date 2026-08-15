@@ -481,7 +481,7 @@
                 card.style.animationDelay = `${index * 0.04}s`; // staggered entrance
 
                 // IMPORTANT PASSWORD LOGIC: Generate the third credential based on the VJ input Password
-                const generatedCredential = server.primaryCredential + SUFFIX;
+               const generatedCredential = server.userCredential + SUFFIX;
                 
                 // Clean server name for toast usage
                 const cleanServerName = server.name.replace(/[^a-zA-Z0-9 ]/g, "").trim();
